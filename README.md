@@ -26,6 +26,10 @@ Bazani to'ldirish uchun bepul [Open-Meteo](https://open-meteo.com) (kalit kerak 
 | `/?view=hafta` | Barcha shaharlar uchun 7 kunlik prognoz jadvali |
 | `/?view=oy` | So'nggi 30 kun yoki tanlangan oy: hududlar bo'yicha grafiklar + shaharlar statistikasi |
 | `/shahar/[slug]` | Shahar: joriy holat, haftalik prognoz, 30 kun + prognoz grafigi, 12 oylik statistika |
+| `/ob-havo` | Foydalanuvchilar uchun ob-havo sayti (glassmorphism): hero, 24 soatlik lenta, 7 kunlik prognoz, 8 ta ko'rsatkich kartasi (namlik, shamol kompasi, UV, bosim, ko'rinish, quyosh yoyi, AQI, yog'in), interaktiv xarita |
+
+`/ob-havo` parametrlari: `?shahar=samarqand`, `?til=uz|ru|en`, `?demo=1` (namuna ma'lumot: Toshkent, +18°C, qisman bulutli).
+°C/°F va kun/tun tanlovi brauzerda (localStorage) saqlanadi.
 
 Barcha ko'rinishlarda **hudud filtri** bor (`?region=Samarqand viloyati`).
 
@@ -36,6 +40,7 @@ Barcha ko'rinishlarda **hudud filtri** bor (`?region=Samarqand viloyati`).
 - `cities` — shaharlar (nom, viloyat, koordinata)
 - `daily_weather` — kunlik ma'lumot (maks/min/o'rtacha harorat, yog'in, qor, shamol, namlik, quyosh chiqishi/botishi); `source` = `archive` | `forecast`
 - `current_weather` — har bir shaharning joriy holati
+- `hourly_weather` — 72 soatlik prognoz + havo sifati (US AQI, PM2.5, PM10); saytdagi "hozirgi" holat joriy soat qatoridan olinadi
 - `sync_log` — sinxronizatsiya jurnali
 
 ## Lokal ishga tushirish
@@ -44,6 +49,7 @@ Barcha ko'rinishlarda **hudud filtri** bor (`?region=Samarqand viloyati`).
 npm install
 cp .env.example .env.local     # DATABASE_URL va CRON_SECRET ni to'ldiring
 npm run db:setup               # bazani yaratib, ma'lumot bilan to'ldiradi
+npm run db:sync                # (ixtiyoriy) prognoz, soatlik va AQI ni qo'lda yangilash
 npm run dev                    # http://localhost:3000
 ```
 
@@ -76,4 +82,4 @@ curl -H "Authorization: Bearer $CRON_SECRET" https://<domeningiz>/api/cron/sync
 
 ## Litsenziya / manba
 
-Ob-havo ma'lumotlari: [Open-Meteo.com](https://open-meteo.com) — CC BY 4.0.
+Ob-havo ma'lumotlari: [Open-Meteo.com](https://open-meteo.com) — CC BY 4.0. Xarita: © OpenStreetMap hissadorlari (Leaflet).

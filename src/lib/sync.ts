@@ -1,6 +1,6 @@
 import type postgres from "postgres";
 import { CITIES } from "./cities";
-import { fetchArchive, fetchForecast, type DailyBlock } from "./openmeteo";
+import { fetchAirQuality, fetchArchive, fetchForecast, fetchHourly, type DailyBlock } from "./openmeteo";
 
 type CityRow = { id: number; slug: string; latitude: number; longitude: number };
 
@@ -182,6 +182,96 @@ export async function syncArchive(
       total += rows.length;
       onProgress?.(Math.min(i + size, cities.length), cities.length);
     }
+    return total;
+  });
+}
+
+const HOURS_TO_KEEP = 72; // bugundan boshlab 3 kun
+
+/** Soatlik prognoz + havo sifati; kunlik yog'in ehtimoli va UV maksimumi. */
+export async function syncHourly(sql: postgres.Sql) {
+  return withLog(sql, "hourly", async () => {
+    const cities = await loadCities(sql);
+    let total = 0;
+    for (let i = 0; i < cities.length; i += BATCH) {
+      const batch = cities.slice(i, i + BATCH);
+      const coords = batch.map((c) => ({ lat: c.latitude, lon: c.longitude }));
+      const [wx, air] = await Promise.all([fetchHourly(coords), fetchAirQuality(coords).catch(() => null)]);
+
+      const rows: Record<string, string | number | boolean | null>[] = [];
+      const dailyExtra: { city_id: number; date: string; precipitation_probability_max: number | null; uv_index_max: number | null }[] = [];
+      for (let j = 0; j < batch.length; j++) {
+        const h = wx[j].hourly;
+        const a = air?.[j]?.hourly;
+        const aqiAt = new Map((a?.time ?? []).map((t, k) => [t, k]));
+        for (let k = 0; k < Math.min(h.time.length, HOURS_TO_KEEP); k++) {
+          const ai = aqiAt.get(h.time[k]);
+          rows.push({
+            city_id: batch[j].id,
+            time: `${h.time[k]}:00+05:00`,
+            temperature: h.temperature_2m[k],
+            apparent_temperature: h.apparent_temperature[k],
+            humidity: h.relative_humidity_2m[k],
+            precipitation_probability: h.precipitation_probability[k],
+            precipitation: h.precipitation[k],
+            weather_code: h.weather_code[k],
+            pressure: h.pressure_msl[k],
+            visibility: h.visibility[k],
+            wind_speed: h.wind_speed_10m[k],
+            wind_direction: h.wind_direction_10m[k],
+            uv_index: h.uv_index[k],
+            is_day: h.is_day[k] == null ? null : h.is_day[k] === 1,
+            us_aqi: ai != null ? a!.us_aqi[ai] : null,
+            pm2_5: ai != null ? a!.pm2_5[ai] : null,
+            pm10: ai != null ? a!.pm10[ai] : null,
+          });
+        }
+        const d = wx[j].daily;
+        d.time.forEach((date, k) =>
+          dailyExtra.push({
+            city_id: batch[j].id,
+            date,
+            precipitation_probability_max: d.precipitation_probability_max[k],
+            uv_index_max: d.uv_index_max[k],
+          }),
+        );
+      }
+
+      const CHUNK = 3000;
+      for (let k = 0; k < rows.length; k += CHUNK) {
+        await sql`
+          insert into hourly_weather ${sql(rows.slice(k, k + CHUNK))}
+          on conflict (city_id, time) do update set
+            temperature = excluded.temperature,
+            apparent_temperature = excluded.apparent_temperature,
+            humidity = excluded.humidity,
+            precipitation_probability = excluded.precipitation_probability,
+            precipitation = excluded.precipitation,
+            weather_code = excluded.weather_code,
+            pressure = excluded.pressure,
+            visibility = excluded.visibility,
+            wind_speed = excluded.wind_speed,
+            wind_direction = excluded.wind_direction,
+            uv_index = excluded.uv_index,
+            is_day = excluded.is_day,
+            us_aqi = coalesce(excluded.us_aqi, hourly_weather.us_aqi),
+            pm2_5 = coalesce(excluded.pm2_5, hourly_weather.pm2_5),
+            pm10 = coalesce(excluded.pm10, hourly_weather.pm10),
+            updated_at = now()
+        `;
+      }
+      // Kunlik qatorlarga ehtimollik va UV ni qo'shamiz (qator mavjud bo'lsa)
+      await sql`
+        update daily_weather d set
+          precipitation_probability_max = v.p::real,
+          uv_index_max = v.u::real
+        from (values ${sql(dailyExtra.map((r) => [r.city_id, r.date, r.precipitation_probability_max, r.uv_index_max]))})
+          as v(city_id, date, p, u)
+        where d.city_id = v.city_id::int and d.date = v.date::date
+      `;
+      total += rows.length;
+    }
+    await sql`delete from hourly_weather where time < now() - interval '1 day'`;
     return total;
   });
 }

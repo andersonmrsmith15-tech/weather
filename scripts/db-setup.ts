@@ -16,7 +16,7 @@ function isoDate(d: Date) {
 
 async function main() {
   const { getSql } = await import("../src/lib/db");
-  const { seedCities, syncArchive, syncForecast } = await import("../src/lib/sync");
+  const { seedCities, syncArchive, syncForecast, syncHourly } = await import("../src/lib/sync");
   const sql = getSql();
 
   console.log("1/4 Sxema yaratilmoqda...");
@@ -33,6 +33,8 @@ async function main() {
 
   console.log("4/4 Prognoz va joriy holat yuklanmoqda...");
   console.log(`    ${await syncForecast(sql)} qator`);
+  console.log("    soatlik prognoz va havo sifati...");
+  console.log(`    ${await syncHourly(sql)} qator`);
 
   await sql.end();
   console.log("Tayyor ✅");

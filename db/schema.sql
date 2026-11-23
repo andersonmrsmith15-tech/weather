@@ -51,3 +51,32 @@ create table if not exists sync_log (
   ok           boolean,
   error        text
 );
+
+-- v2: ob-havo sayti uchun qo'shimcha maydonlar
+alter table daily_weather add column if not exists precipitation_probability_max real;  -- %
+alter table daily_weather add column if not exists uv_index_max real;
+
+-- Soatlik prognoz (+ havo sifati). "Hozirgi" holat joriy soat qatoridan olinadi.
+create table if not exists hourly_weather (
+  city_id                    integer not null references cities(id) on delete cascade,
+  time                       timestamptz not null,
+  temperature                real,
+  apparent_temperature       real,
+  humidity                   real,
+  precipitation_probability  real,   -- %
+  precipitation              real,   -- mm
+  weather_code               smallint,
+  pressure                   real,   -- hPa
+  visibility                 real,   -- m
+  wind_speed                 real,   -- km/soat
+  wind_direction             real,   -- daraja
+  uv_index                   real,
+  is_day                     boolean,
+  us_aqi                     real,
+  pm2_5                      real,
+  pm10                       real,
+  updated_at                 timestamptz not null default now(),
+  primary key (city_id, time)
+);
+
+create index if not exists hourly_weather_time_idx on hourly_weather (time);

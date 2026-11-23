@@ -104,3 +104,47 @@ export function fetchArchive(coords: Coord[], startDate: string, endDate: string
     `&daily=${DAILY_VARS}&timezone=${encodeURIComponent(TZ)}`;
   return getJson(url);
 }
+
+const HOURLY_VARS = [
+  "temperature_2m", "apparent_temperature", "relative_humidity_2m",
+  "precipitation_probability", "precipitation", "weather_code", "pressure_msl",
+  "visibility", "wind_speed_10m", "wind_direction_10m", "uv_index", "is_day",
+].join(",");
+
+export type HourlyBlock = {
+  time: string[];
+  temperature_2m: Num[];
+  apparent_temperature: Num[];
+  relative_humidity_2m: Num[];
+  precipitation_probability: Num[];
+  precipitation: Num[];
+  weather_code: Num[];
+  pressure_msl: Num[];
+  visibility: Num[];
+  wind_speed_10m: Num[];
+  wind_direction_10m: Num[];
+  uv_index: Num[];
+  is_day: Num[];
+};
+
+export type AirBlock = { time: string[]; us_aqi: Num[]; pm2_5: Num[]; pm10: Num[] };
+
+/** Soatlik prognoz (bugun + 2 kun) va kunlik ehtimollik/UV. */
+export async function fetchHourly(coords: Coord[]) {
+  const url =
+    `https://api.open-meteo.com/v1/forecast?${coordParams(coords)}` +
+    `&hourly=${HOURLY_VARS}&daily=precipitation_probability_max,uv_index_max` +
+    `&timezone=${encodeURIComponent(TZ)}&forecast_days=16`;
+  return (await getJson(url)) as unknown as {
+    hourly: HourlyBlock;
+    daily: { time: string[]; precipitation_probability_max: Num[]; uv_index_max: Num[] };
+  }[];
+}
+
+/** Havo sifati (US AQI, PM2.5, PM10) — soatlik. */
+export async function fetchAirQuality(coords: Coord[]) {
+  const url =
+    `https://air-quality-api.open-meteo.com/v1/air-quality?${coordParams(coords)}` +
+    `&hourly=us_aqi,pm2_5,pm10&timezone=${encodeURIComponent(TZ)}&forecast_days=3`;
+  return (await getJson(url)) as unknown as { hourly: AirBlock }[];
+}
