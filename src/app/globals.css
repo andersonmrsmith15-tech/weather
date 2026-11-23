@@ -1,0 +1,67 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: light;
+  --bg: #f4f4f1;
+  --surface: #fcfcfb;
+  --surface-2: #f0efec;
+  --line: #e3e2dc;
+  --ink: #0b0b0b;
+  --ink-2: #52514e;
+  --muted: #7d7c77;
+  --grid: #e9e8e4;
+  --accent: #2a78d6;
+  /* grafik seriyalari (kategorik palitra, tekshirilgan tartib) */
+  --s-min: #2a78d6;   /* min harorat — ko'k */
+  --s-max: #eb6834;   /* maks harorat — to'q sariq */
+  --s-rain: #1baf7a;  /* yog'in — moviy-yashil */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --bg: #111110;
+    --surface: #1a1a19;
+    --surface-2: #232321;
+    --line: #2f2f2c;
+    --ink: #f0efec;
+    --ink-2: #c3c2b7;
+    --muted: #8f8e86;
+    --grid: #2a2a28;
+    --accent: #3987e5;
+    --s-min: #3987e5;
+    --s-max: #d95926;
+    --s-rain: #199e70;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-s-min: var(--s-min);
+  --color-s-max: var(--s-max);
+  --color-s-rain: var(--s-rain);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Recharts fokus chizig'ini olib tashlash */
+.recharts-wrapper *:focus {
+  outline: none;
+}
