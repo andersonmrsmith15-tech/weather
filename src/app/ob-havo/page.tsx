@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { Backdrop } from "@/components/site/backdrop";
 import { SiteHeader } from "@/components/site/header";
+import { AppBehaviors, BottomTabs, InstallPrompt, OfflineBanner } from "@/components/site/pwa";
 import { Daily, Details, Hero, Hourly, SiteFooter } from "@/components/site/sections";
 import { WeatherMap } from "@/components/site/weather-map";
 import { getDemoData, getSiteData, type SiteData } from "@/lib/site-data";
@@ -12,6 +13,7 @@ export default function WeatherPage({ searchParams }: PageProps<"/ob-havo">) {
       {searchParams.then((sp) => (
         <WeatherContent
           slug={typeof sp.shahar === "string" ? sp.shahar : "toshkent"}
+          explicit={typeof sp.shahar === "string"}
           lang={parseLang(sp.til)}
           demo={sp.demo === "1"}
         />
@@ -20,7 +22,7 @@ export default function WeatherPage({ searchParams }: PageProps<"/ob-havo">) {
   );
 }
 
-async function WeatherContent({ slug, lang, demo }: { slug: string; lang: ReturnType<typeof parseLang>; demo: boolean }) {
+async function WeatherContent({ slug, explicit, lang, demo }: { slug: string; explicit: boolean; lang: ReturnType<typeof parseLang>; demo: boolean }) {
   const t = DICTS[lang];
   let data: SiteData | null = null;
   let fallback = demo;
@@ -62,15 +64,15 @@ async function WeatherContent({ slug, lang, demo }: { slug: string; lang: Return
       )}
 
       <main className="mx-auto grid w-full max-w-7xl flex-1 grid-cols-1 content-start items-start gap-4 px-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_400px] lg:gap-5">
-        <div className="lg:col-start-1"><Hero data={data} t={t} lang={lang} /></div>
+        <div id="hozir" className="scroll-mt-4 lg:col-start-1"><Hero data={data} t={t} lang={lang} /></div>
         <aside className="flex flex-col gap-4 lg:col-start-2 lg:row-span-3 lg:row-start-1" aria-label={t.week}>
           <div className="flex flex-col gap-4 lg:sticky lg:top-4">
-            <Hourly data={data} t={t} lang={lang} />
-            <Daily data={data} t={t} lang={lang} />
+            <div id="soatlik" className="scroll-mt-4"><Hourly data={data} t={t} lang={lang} /></div>
+            <div id="hafta" className="scroll-mt-4"><Daily data={data} t={t} lang={lang} /></div>
           </div>
         </aside>
         <div className="lg:col-start-1"><Details data={data} t={t} lang={lang} /></div>
-        <div className="lg:col-start-1">
+        <div id="xarita" className="scroll-mt-4 lg:col-start-1">
           <WeatherMap
             points={data.map}
             activeSlug={data.city.slug}
@@ -81,6 +83,16 @@ async function WeatherContent({ slug, lang, demo }: { slug: string; lang: Return
       </main>
 
       <SiteFooter t={t} lang={lang} slug={data.city.slug} demo={data.demo && demo} langs={LANGS} />
+
+      <BottomTabs tabs={[
+        { id: "hozir", label: t.tabNow },
+        { id: "soatlik", label: t.tabHourly },
+        { id: "hafta", label: t.tabWeek },
+        { id: "xarita", label: t.tabMap },
+      ]} />
+      <InstallPrompt t={{ title: t.installTitle, body: t.installBody, install: t.installBtn, later: t.installLater, ios: t.installIos }} />
+      <OfflineBanner text={t.offline} />
+      {!data.demo && <AppBehaviors slug={data.city.slug} explicit={explicit} lang={lang} />}
     </div>
   );
 }

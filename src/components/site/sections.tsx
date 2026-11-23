@@ -12,7 +12,7 @@ export function Hero({ data, t, lang }: { data: SiteData; t: Dict; lang: Lang })
   const today = days[0];
   const label = wxLabel(now.code, lang);
   return (
-    <section className="glass flex min-h-[calc(100svh-9rem)] flex-col justify-between p-6 sm:p-8 lg:min-h-0" aria-labelledby="hero-city">
+    <section className="glass hero-full flex flex-col justify-between p-6 sm:p-8" aria-labelledby="hero-city">
       <div>
         <h1 id="hero-city" className="text-3xl font-bold tracking-tight sm:text-4xl">{city.name}</h1>
         <p className="mt-1 text-sm text-2nd">
@@ -58,7 +58,7 @@ export function Hourly({ data, t, lang }: { data: SiteData; t: Dict; lang: Lang 
         <span className="text-xs text-2nd">{t.hourlyHint}</span>
       </div>
       <ol
-        className="hide-scrollbar -mx-1 flex snap-x gap-2 overflow-x-auto px-1 pb-1"
+        className="hide-scrollbar relative -mx-1 flex snap-x gap-2 overflow-x-auto px-1 pb-1"
         tabIndex={0}
         aria-label={`${t.hourly} — ${t.hourlyHint}`}
       >
@@ -301,7 +301,7 @@ export function SiteFooter({ t, lang, slug, demo, langs }: { t: Dict; lang: Lang
     return `/ob-havo?${p}`;
   };
   return (
-    <footer className="mx-auto mt-6 flex w-full max-w-7xl flex-col items-center justify-between gap-3 px-4 pb-8 text-sm text-2nd sm:flex-row sm:px-6">
+    <footer className="tabbar-space mx-auto mt-6 flex w-full max-w-7xl flex-col items-center justify-between gap-3 px-4 text-sm text-2nd sm:flex-row sm:px-6">
       <p>{t.source}</p>
       <nav aria-label={t.language} className="glass flex rounded-full! p-1">
         {langs.map((l) => (

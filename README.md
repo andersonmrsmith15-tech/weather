@@ -33,6 +33,18 @@ Bazani to'ldirish uchun bepul [Open-Meteo](https://open-meteo.com) (kalit kerak 
 
 Barcha ko'rinishlarda **hudud filtri** bor (`?region=Samarqand viloyati`).
 
+## Mobil ilova (PWA)
+
+Sayt telefonga ilova sifatida o'rnatiladi (Android: Chrome → «Ilovani o'rnatish»; iPhone: Safari → Ulashish → «Bosh ekranga qo'shish»).
+
+- `src/app/manifest.ts` — nom, ikonkalar (maskable ham), tez havolalar (Toshkent, Samarqand, Dashboard)
+- `public/sw.js` — service worker: ochilgan sahifalar va xarita plitkalari keshlanadi, internetsiz ham ochiladi; saqlanmagan sahifa uchun `/ob-havo/offline`
+- Ilova rejimida: pastki tab-bar (Hozir / Soatlik / 7 kun / Xarita), iPhone safe-area, oxirgi shahar eslab qolinadi, 10 daqiqadan keyin qaytilganda ma'lumot yangilanadi, internet yo'qligi haqida xabar
+- Ikonkalarni qayta yaratish: `node scripts/make-icons.mjs`
+
+> Service worker faqat production'da yoqiladi (`npm run build && npm start`). PWA o'rnatish HTTPS talab qiladi —
+> Vercel'da avtomatik; lokalda faqat `localhost` da ishlaydi. `public/sw.js` dagi kesh strategiyasini o'zgartirsangiz, `VERSION` ni oshiring.
+
 ## Baza sxemasi
 
 `db/schema.sql`:

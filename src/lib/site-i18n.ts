@@ -67,6 +67,13 @@ const uz = {
   weekdays: ["Yakshanba", "Dushanba", "Seshanba", "Chorshanba", "Payshanba", "Juma", "Shanba"],
   weekdaysShort: ["Yak", "Du", "Se", "Chor", "Pay", "Ju", "Sha"],
   months: ["yanvar", "fevral", "mart", "aprel", "may", "iyun", "iyul", "avgust", "sentabr", "oktabr", "noyabr", "dekabr"],
+  tabNow: "Hozir", tabHourly: "Soatlik", tabWeek: "7 kun", tabMap: "Xarita",
+  installTitle: "Ob-havo ilovasini o'rnating",
+  installBody: "Bosh ekrandan bir bosishda oching, internetsiz ham ishlaydi",
+  installBtn: "O'rnatish",
+  installLater: "Keyinroq",
+  installIos: "Ulashish tugmasini (□↑) bosing va «Bosh ekranga qo'shish» ni tanlang",
+  offline: "Internet yo'q — oxirgi saqlangan ma'lumot ko'rsatilmoqda",
   locale: "uz-Latn-UZ",
 };
 
@@ -132,6 +139,13 @@ const ru: Dict = {
   weekdays: ["Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"],
   weekdaysShort: ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"],
   months: ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"],
+  tabNow: "Сейчас", tabHourly: "По часам", tabWeek: "7 дней", tabMap: "Карта",
+  installTitle: "Установите приложение «Погода»",
+  installBody: "Открывайте с главного экрана, работает и без интернета",
+  installBtn: "Установить",
+  installLater: "Позже",
+  installIos: "Нажмите «Поделиться» (□↑) и выберите «На экран «Домой»»",
+  offline: "Нет интернета — показаны последние сохранённые данные",
   locale: "ru-RU",
 };
 
@@ -195,6 +209,13 @@ const en: Dict = {
   weekdays: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
   weekdaysShort: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
   months: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+  tabNow: "Now", tabHourly: "Hourly", tabWeek: "7 days", tabMap: "Map",
+  installTitle: "Install the Weather app",
+  installBody: "Open it from your home screen — works offline too",
+  installBtn: "Install",
+  installLater: "Later",
+  installIos: "Tap Share (□↑) and choose “Add to Home Screen”",
+  offline: "You're offline — showing the last saved data",
   locale: "en-GB",
 };
 
